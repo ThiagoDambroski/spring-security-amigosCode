@@ -28,7 +28,7 @@ public class StudentMangementController {
 		return students;
 	}
 	
-	@PostMapping(path = "{studentId}")
+	@PostMapping
 	public void newStudent(@RequestBody Student student) {
 		System.out.println("newStudent");
 		System.out.println(student);
@@ -41,7 +41,7 @@ public class StudentMangementController {
 	}
 	
 	@PutMapping(path = "{studentId}")
-	public void updateStudent(@PathVariable("studentId") Integer studentId, Student student) {
+	public void updateStudent(@PathVariable("studentId") Integer studentId,@RequestBody Student student) {
 		System.out.println("updateStudent");
 		System.out.println(String.format("%s %s", studentId,student ));
 	}
