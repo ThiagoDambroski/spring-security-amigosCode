@@ -3,6 +3,7 @@ package com.dambroski.springsecurityamigosCode.student;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,24 +24,30 @@ public class StudentMangementController {
 			Student.builder().studentId((long) 3).name("denji").build()
 			);
 	
+// hasRole('ROLE_') hasAnyRole('ROLE_') hasAuthority('permission') hasAnyAuthority('permission')
+	
 	@GetMapping
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_ADMINTRAINEE')")
 	public List<Student> getAllStudents(){
 		return students;
 	}
 	
 	@PostMapping
+	@PreAuthorize("hasAuthority('student:write')")
 	public void newStudent(@RequestBody Student student) {
 		System.out.println("newStudent");
 		System.out.println(student);
 	}
 	
 	@DeleteMapping(path = "{studentId}")
+	@PreAuthorize("hasAuthority('student:write')")
 	public void deleteStudent(@PathVariable("studentId") Integer studentID) {
 		System.out.println("deleteStudent");
 		System.out.println(studentID);
 	}
 	
 	@PutMapping(path = "{studentId}")
+	@PreAuthorize("hasAuthority('student:write')")
 	public void updateStudent(@PathVariable("studentId") Integer studentId,@RequestBody Student student) {
 		System.out.println("updateStudent");
 		System.out.println(String.format("%s %s", studentId,student ));
