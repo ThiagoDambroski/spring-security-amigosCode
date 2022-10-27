@@ -1,5 +1,7 @@
 package com.dambroski.springsecurityamigosCode.security;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,7 +48,11 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 		.and()
 		.formLogin()
 		.loginPage("/login").permitAll()
-		.defaultSuccessUrl("/courses",true);
+		.defaultSuccessUrl("/courses",true)
+		.and()
+		.rememberMe()
+		.tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(21))
+		.key("somethingverysecured");
 	}
 	
 	@Override
