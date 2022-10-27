@@ -45,7 +45,8 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 		.authenticated() // any request must be authenticated
 		.and()
 		.formLogin()
-		.loginPage("/login").permitAll();
+		.loginPage("/login").permitAll()
+		.defaultSuccessUrl("/courses",true);
 	}
 	
 	@Override
