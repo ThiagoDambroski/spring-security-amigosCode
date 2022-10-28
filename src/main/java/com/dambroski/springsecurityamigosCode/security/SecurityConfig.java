@@ -5,6 +5,8 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,16 +19,20 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.dambroski.springsecurityamigosCode.auth.ApplicationUserService;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 	
 	private final PasswordEncoder passwordEncoder;
+	private final ApplicationUserService applicationUserService;
 	
 	@Autowired
-	public SecurityConfig(PasswordEncoder passwordEncoder) {
+	public SecurityConfig(PasswordEncoder passwordEncoder,ApplicationUserService applicationUserService) {
 		this.passwordEncoder = passwordEncoder;
+		this.applicationUserService = applicationUserService;
 	}
 	
 	@Override
@@ -66,29 +72,15 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 	}
 	
 	@Override
+	protected void configure(AuthenticationManagerBuilder auth)throws Exception {
+		auth.authenticationProvider(daoAuthenticationProvider());
+	}
+	
 	@Bean
-	protected UserDetailsService userDetailsService() {
-	UserDetails leticiaUser = User.builder()
-			.username("leticia")
-			.password(passwordEncoder.encode("linda"))
-			//.roles(ApplicationUserRole.STUDENT.name()) //ROLE_STUDENT
-			.authorities(ApplicationUserRole.STUDENT.getGrantedAuthorities())
-			.build();
-	
-	UserDetails thiagoUser = User.builder()
-			.username("thiago")
-			.password(passwordEncoder.encode("123"))
-			//.roles(ApplicationUserRole.ADMIN.name())
-			.authorities(ApplicationUserRole.ADMIN.getGrantedAuthorities())
-			.build();
-	
-	UserDetails loideUser = User.builder()
-			.username("loide")
-			.password(passwordEncoder.encode("123"))
-			//.roles(ApplicationUserRole.ADMINTRAINEE.name())
-			.authorities(ApplicationUserRole.ADMINTRAINEE.getGrantedAuthorities())
-			.build();
-	
-	return new InMemoryUserDetailsManager(leticiaUser,thiagoUser,loideUser);
+	public DaoAuthenticationProvider daoAuthenticationProvider() { 
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setPasswordEncoder(passwordEncoder);
+		provider.setUserDetailsService(applicationUserService);
+		return provider;
 	}
 }
