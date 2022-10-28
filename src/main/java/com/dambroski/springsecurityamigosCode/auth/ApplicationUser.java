@@ -1,7 +1,7 @@
 package com.dambroski.springsecurityamigosCode.auth;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,14 +11,14 @@ public class ApplicationUser implements UserDetails{
 	
 	private final String password;
 	private final String username;
-	private final List<? extends GrantedAuthority> grantedAuthority;
+	private final Set<? extends GrantedAuthority> grantedAuthority;
 	private final boolean isAccountNonExpired;
 	private final boolean isAccountNonlocked;
 	private final boolean isCredentialsNonExpired;
 	private final boolean isEnabled;
 	
 
-	public ApplicationUser(List<? extends GrantedAuthority> grantedAuthority, String password, String username,
+	public ApplicationUser(String username,String password,Set<? extends GrantedAuthority> grantedAuthority,
 			boolean isAccountNonExpired, boolean isAccountNonlocked, boolean isCredentialsNonExpired,
 			boolean isEnabled) {
 		this.grantedAuthority = grantedAuthority;
