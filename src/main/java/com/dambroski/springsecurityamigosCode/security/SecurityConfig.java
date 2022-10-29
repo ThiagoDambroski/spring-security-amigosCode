@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +21,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.dambroski.springsecurityamigosCode.auth.ApplicationUserService;
+import com.dambroski.springsecurityamigosCode.jwt.JwtUsernamaAndPasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -41,6 +43,9 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 		//.csrf().csrfTokenRepository(CookieCsrfTokenRepository.wi thHttpOnlyFalse())
 		//.and()
 		.csrf().disable()
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		.and()
+		.addFilter(new JwtUsernamaAndPasswordAuthenticationFilter(authenticationManager()))
 		.authorizeRequests()
 		.antMatchers("/", "index", "/css/*","/js/*").permitAll()
 		.antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())
@@ -51,12 +56,14 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 		.antMatchers(HttpMethod.GET,"/management/api/**").hasAnyRole(ApplicationUserRole.ADMIN.name(),ApplicationUserRole.ADMINTRAINEE.name())
 		*/
 		.anyRequest()
-		.authenticated() // any request must be authenticated
+		.authenticated(); // any request must be authenticated
+		/*
 		.and()
 		.formLogin()
 			.loginPage("/login")
 			.permitAll()
 			.defaultSuccessUrl("/courses",true)
+			
 		.and()
 		.rememberMe()
 			.tokenValiditySeconds((int)TimeUnit.DAYS.toSeconds(21))
@@ -69,6 +76,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 			.invalidateHttpSession(true)
 			.deleteCookies("JSESSIONID","remember-me")
 			.logoutSuccessUrl("/login");
+			*/
 	}
 	
 	@Override

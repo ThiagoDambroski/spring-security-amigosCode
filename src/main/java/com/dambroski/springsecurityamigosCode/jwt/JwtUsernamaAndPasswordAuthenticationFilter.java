@@ -64,7 +64,7 @@ public class JwtUsernamaAndPasswordAuthenticationFilter  extends UsernamePasswor
 			.signWith(Keys.hmacShaKeyFor(key.getBytes()))
 			.compact();
 		
-		response.addHeader("Authorization",token);
+		response.addHeader("Authorization","Bearer" + token);
 	}
 
 }
