@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Date;
 
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,14 +19,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 
 public class JwtUsernamaAndPasswordAuthenticationFilter  extends UsernamePasswordAuthenticationFilter{
 	
 	private final AuthenticationManager authenticationManager;
+	private final JwtConfig config;
+	private final SecretKey jwtSecretKey;
 
-	public JwtUsernamaAndPasswordAuthenticationFilter(AuthenticationManager authenticationManager) {
+	public JwtUsernamaAndPasswordAuthenticationFilter(AuthenticationManager authenticationManager, JwtConfig config,
+			SecretKey jwtSecretKey) {
 		this.authenticationManager = authenticationManager;
+		this.config = config;
+		this.jwtSecretKey = jwtSecretKey;
 	}
 
 	@Override
@@ -55,16 +60,15 @@ public class JwtUsernamaAndPasswordAuthenticationFilter  extends UsernamePasswor
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		
-		String key = "securesecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecuresecure";
 		String token = Jwts.builder()
 			.setSubject(authResult.getName())
 			.claim("authorities", authResult.getAuthorities())
 			.setIssuedAt(new Date())
 			.setExpiration(java.sql.Date.valueOf(LocalDate.now().plusWeeks(2)))
-			.signWith(Keys.hmacShaKeyFor(key.getBytes()))
+			.signWith(jwtSecretKey)
 			.compact();
 		
-		response.addHeader("Authorization","Bearer" + token);
+		response.addHeader(config.getAuthorizationHeader(),config.getTokenPrefix() + token);
 	}
 
 }

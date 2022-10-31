@@ -2,6 +2,8 @@ package com.dambroski.springsecurityamigosCode.security;
 
 import java.util.concurrent.TimeUnit;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.dambroski.springsecurityamigosCode.auth.ApplicationUserService;
+import com.dambroski.springsecurityamigosCode.jwt.JwtConfig;
 import com.dambroski.springsecurityamigosCode.jwt.JwtTokenVerifier;
 import com.dambroski.springsecurityamigosCode.jwt.JwtUsernamaAndPasswordAuthenticationFilter;
 
@@ -31,11 +34,17 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 	
 	private final PasswordEncoder passwordEncoder;
 	private final ApplicationUserService applicationUserService;
+	private final SecretKey secretKey;
+	private final JwtConfig jwtConfig;
 	
 	@Autowired
-	public SecurityConfig(PasswordEncoder passwordEncoder,ApplicationUserService applicationUserService) {
+	public SecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserService,
+			SecretKey secretKey, JwtConfig jwtConfig) {
+
 		this.passwordEncoder = passwordEncoder;
 		this.applicationUserService = applicationUserService;
+		this.secretKey = secretKey;
+		this.jwtConfig = jwtConfig;
 	}
 	
 	@Override
@@ -47,8 +56,8 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 		.sessionManagement()
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
-		.addFilter(new JwtUsernamaAndPasswordAuthenticationFilter(authenticationManager()))
-		.addFilterAfter(new JwtTokenVerifier(),JwtUsernamaAndPasswordAuthenticationFilter.class)
+		.addFilter(new JwtUsernamaAndPasswordAuthenticationFilter(authenticationManager(),jwtConfig,secretKey))
+		.addFilterAfter(new JwtTokenVerifier(secretKey,jwtConfig),JwtUsernamaAndPasswordAuthenticationFilter.class)
 		.authorizeRequests()
 		.antMatchers("/", "index", "/css/*","/js/*").permitAll()
 		.antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())
@@ -82,6 +91,8 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 			*/
 	}
 	
+	
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth)throws Exception {
 		auth.authenticationProvider(daoAuthenticationProvider());

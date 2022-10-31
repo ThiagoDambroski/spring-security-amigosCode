@@ -2,6 +2,9 @@ package com.dambroski.springsecurityamigosCode.jwt;
 
 public class UsernamePasswordAuthenticationRequest {
 	
+	private String username;
+	private String password;
+	
 	public UsernamePasswordAuthenticationRequest() {
 
 	}
@@ -18,8 +21,7 @@ public class UsernamePasswordAuthenticationRequest {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	private String username;
-	private String password;
+	
 	
 	
 	
