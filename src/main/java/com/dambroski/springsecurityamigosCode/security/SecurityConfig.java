@@ -21,6 +21,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.dambroski.springsecurityamigosCode.auth.ApplicationUserService;
+import com.dambroski.springsecurityamigosCode.jwt.JwtTokenVerifier;
 import com.dambroski.springsecurityamigosCode.jwt.JwtUsernamaAndPasswordAuthenticationFilter;
 
 @Configuration
@@ -47,6 +48,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter{
 			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
 		.addFilter(new JwtUsernamaAndPasswordAuthenticationFilter(authenticationManager()))
+		.addFilterAfter(new JwtTokenVerifier(),JwtUsernamaAndPasswordAuthenticationFilter.class)
 		.authorizeRequests()
 		.antMatchers("/", "index", "/css/*","/js/*").permitAll()
 		.antMatchers("/api/**").hasRole(ApplicationUserRole.STUDENT.name())
